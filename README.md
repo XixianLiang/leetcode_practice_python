@@ -1,1 +1,3 @@
-# leetcode_practice_python
+# README
+
+Leetcode practice in python
