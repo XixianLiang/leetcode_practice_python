@@ -1,24 +1,30 @@
 from typing import List
-
+from functools import cache
 
 class Solution:
     def numSquares(self, n: int) -> int:
-        if n == 0:
-            return 0
-        if n == 1:
-            return 1
+        if n <= 3:
+            return n
         squares = []
-        i = 1
-        while i <= n:
-            squares.append(i**2)
-            i += 1
+        for i in range(n // 2, 0, -1):
+            temp = i ** 2
+            if temp == n:
+                return 1
+            elif temp < n:
+                squares.append(i ** 2)
 
-        dp = [float("inf") for _ in range(n + 1)]
-        dp[0] = 0
-        dp[1] = 1
-        for j in range(2, n + 1):
-            dp[j] = min(dp[j - square] + 1 for square in squares if square <= j)
-        return dp[-1]
+        self.ans = n
+        
+        @cache
+        def traceback(target, k):
+            for square in squares:
+                if square == target: 
+                    self.ans = min(k + 1, self.ans)
+                if square < target:
+                    traceback(target - square, k + 1)
+        
+        traceback(n, 0)
+        return self.ans
 
 
-print(Solution().numSquares(5756))
+print(Solution().numSquares(340))
