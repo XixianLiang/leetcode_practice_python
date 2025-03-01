@@ -2,30 +2,25 @@ from typing import List
 
 
 class Solution:
-    def get_bias(self, ch: str):
-        return ord(ch) - 97
-
     def findAnagrams(self, s: str, p: str) -> List[int]:
-        p_counter = [0 for _ in range(26)]
+        if len(s) < len(p):
+            return []
+        l = 0
+        p_bias = dict()
         for ch in p:
-            p_counter[self.get_bias(ch)] += 1
-
+            p_bias[ch] = p_bias.get(ch, 0) + 1
         for i in range(len(p)):
-            p_counter[self.get_bias(s[i])] -= 1
-
+            p_bias[s[i]] = p_bias.get(s[i], 0) - 1
         ans = []
-        i = 0
-        while True:
-            if all([_ == 0 for _ in p_counter]):
-                ans.append(i)
-            if i == len(s) - len(p):
-                break
-
-            p_counter[self.get_bias(s[i])] += 1
-            p_counter[self.get_bias(s[i + len(p)])] -= 1
-            i += 1
-
+        for l in range(len(s) - len(p) + 1):
+            if not any(list(p_bias.values())):
+                ans.append(l)
+            if l < len(s) - len(p):
+                p_bias[s[l]] += 1
+                p_bias[s[l + len(p)]] = p_bias.get(s[l + len(p)], 0) - 1 
+                l += 1
         return ans
+                
 
 
 print(Solution().findAnagrams("abab", "ab"))

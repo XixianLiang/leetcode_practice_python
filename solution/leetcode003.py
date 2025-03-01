@@ -2,17 +2,23 @@ class Solution:
     def lengthOfLongestSubstring(self, s: str) -> int:
         if len(s) <= 1:
             return len(s)
+        h = dict()
+        l = r = 0
         ans = 0
-        for i in range(len(s)):
-            hash_tab = dict()
-            for j in range(i, len(s)):
-                hash_tab[s[j]] = hash_tab.get(s[j], 0) + 1
-                if hash_tab[s[j]] > 1:
-                    ans = max(ans, j - i)
+        while r < len(s):
+            while r < len(s) and not h.get(s[r], 0):
+                h[s[r]] = h.get(s[r], 0) + 1
+                r += 1
+            
+            ans = max(ans, r - l)
+            
+            while r < len(s) and l <= r:
+                pop_ch = s[l]
+                h[pop_ch] -= 1
+                l += 1
+                if pop_ch == s[r]:
                     break
-                if j + 1 == len(s):
-                    ans = max(ans, j + 1 - i)
         return ans
 
 
-print(Solution().lengthOfLongestSubstring("a"))
+print(Solution().lengthOfLongestSubstring("aa"))
