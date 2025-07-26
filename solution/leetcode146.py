@@ -1,76 +1,65 @@
 from typing import Dict
 
-
 class BiNode:
-    def __init__(self, 
-                 key:int=None, 
-                 val:int=None, 
-                 prev: "BiNode"=None, 
-                 next: "BiNode"=None):
+    def __init__(self, key=None, val=None, prev=None, next=None):
         self.key = key
         self.val = val
-        self.prev = prev
         self.next = next
+        self.prev = prev
 
 class LRUCache:
-    
-    # def __str__(self):
-    #     repr_str = []
-    #     p = self.head.next
-    #     while p.next is not None:
-    #         repr_str.append(f" ({p.key}, {p.val}) ")
-    #         p = p.next
-    #     return "->".join(repr_str)
-            
+
     def __init__(self, capacity: int):
-        self._capacity = capacity
-        self._hash: Dict[int, BiNode] = dict()
-        self.head = BiNode()
-        self.rear = BiNode(prev=self.head)
-        self.head.next = self.rear       
+
+        self.front = BiNode()
+        self.rear = BiNode(prev = self.front)
+        self.front.next = self.rear
+        self.hash_map = dict()
+        self.capacity = capacity
 
     def get(self, key: int) -> int:
-        if self._hash.get(key, None) is None:
+        if self.hash_map.get(key, None) is None:
             return -1
-        target_node = self._hash[key]
-        if target_node.prev is self.head:
-            return target_node.val
-        # 先删除这个节点
-        temp = target_node.next
-        target_node.next.prev = target_node.prev
-        target_node.prev.next = temp
-        # 再放到队头
-        target_node.next = self.head.next
-        target_node.prev = self.head
-        self.head.next = target_node
-        target_node.next.prev = target_node
-        # print(self)
-        return target_node.val
+        node = self.hash_map[key]
+        if self.front.next == node:
+            return node.val
+        
+        prev_node = node.prev
+        node.prev.next = node.next
+        node.next.prev = prev_node
+
+        node.next = self.front.next
+        node.prev = self.front
+        self.front.next.prev = node
+        self.front.next = node
+        return node.val
 
     def put(self, key: int, value: int) -> None:
-        if self._hash.get(key, None) is not None:
-            # 已有的时候放到队头
-            self._hash[key].val = value
-            target_node = self._hash[key]
-            
-            target_node.prev.next = target_node.next
-            target_node.next.prev = target_node.prev
-            target_node.next = self.head.next
-            target_node.prev = self.head
-        else:
-            # 没有的时候添加节点
-            if len(self._hash) == self._capacity:
-                del_node = self.rear.prev
-                self._hash.pop(del_node.key)
-                # 删除队尾指针的前一个
-                self.rear.prev = del_node.prev
-                del_node.prev.next = self.rear
-            # 放在队头
-            target_node = BiNode(key, value, self.head, self.head.next)
-            self._hash[key] = target_node   
-        self.head.next = target_node
-        target_node.next.prev = target_node
-        # print(self)
+        if self.hash_map.get(key, None):
+            self.hash_map[key].val = value
+            if self.front.next == self.hash_map[key]:
+                return
+            node = self.hash_map[key]
+            prev_node = node.prev
+            node.prev.next = node.next
+            node.next.prev = prev_node
+
+            node.prev = self.front
+            node.next = self.front.next
+            self.front.next = node
+            node.next.prev = self.front
+            return
+        if len(self.hash_map) == self.capacity:
+            rm_node = self.rear.prev
+            self.hash_map.pop(rm_node.key)
+            self.rear.prev = rm_node.prev
+            rm_node.prev.next = self.rear
+            del rm_node
+
+        node = BiNode(key=key, val=value, prev=self.front, next=self.front.next)
+        self.front.next = node
+        node.next.prev = node
+        self.hash_map[key] = node
 
 ["LRUCache","put","put","put","put","get","get"]
 [[2],[2,1],[1,1],[2,3],[4,1],[1],[2]]

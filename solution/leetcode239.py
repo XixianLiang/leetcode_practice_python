@@ -2,8 +2,6 @@ from typing import List
 from collections import UserList
 
 
-
-
 class MonoList(UserList):
     
     def push(self, e):

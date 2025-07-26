@@ -9,32 +9,44 @@ from typing import List, Optional
 
 
 class Solution:
-    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
-        self.p_lt = [_ for _ in lists]
-        self.cache_val = [p.val if p is not None else 10e5 for p in self.p_lt]
-
-        head = p = ListNode()
-
-        while any([_ != 10e5 for _ in self.cache_val]):
-            val = min(self.cache_val)
-            i = self.cache_val.index(val)
-
-            p.next = self.p_lt[i]
-
-            self.p_lt[i] = self.p_lt[i].next
-
+    def mergeList(self, head1, head2):
+        p = new_head = ListNode()
+        while head1 and head2:
+            if head1.val < head2.val:
+                p.next = head1
+                head1 = head1.next
+            else:
+                p.next = head2
+                head2 = head2.next
             p = p.next
+        
+        if head1:
+            p.next = head1
+        if head2:
+            p.next = head2
+        
+        return new_head.next
 
-            self.cache_val[i] = self.p_lt[i].val if self.p_lt[i] else 10e5
+    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+        if len(lists) == 1:
+            return lists[0]
+        new_list = []
+        for i in range((len(lists)) // 2):
+            l = lists[2 * i]
+            r = lists[2 * i + 1]
+            new_list.append(self.mergeList(l, r))
+        if len(lists) % 2 == 1:
+            new_list.append(lists[-1])
+        return self.mergeKLists(new_list)
 
-        return head.next
 
+a = ListNode(1, ListNode(4, ListNode(5)))
 
-a = ListNode(2, ListNode(3))
+b = ListNode(1, ListNode(3, ListNode(4)))
 
-b = ListNode(1, ListNode(5))
+c = ListNode(2, ListNode(6))
 
-m = Solution().mergeKLists([a, b])
+m = Solution().mergeKLists([a, b, c])
 
 while m:
     print(m.val)
