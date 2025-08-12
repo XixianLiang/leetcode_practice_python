@@ -1,36 +1,39 @@
-import collections
-from typing import Dict
+from collections import Counter
 
-class IncludesMap(Dict):
-    def includes(self, target_map):
-        for key in list(target_map.keys()):
-            if self.get(key, 0) < target_map[key]:
-                return False
-        return True
 
 class Solution:
     def minWindow(self, s: str, t: str) -> str:
-        if len(s) < len(t):
-            return ""
-        included_map = IncludesMap()
-        target_map = IncludesMap(collections.Counter(t))
         
-        i = 0
-        ans = "*" * int(1e6)
-        has_ans = False
-        for j in range(len(s)):
-            if s[j] in t:
-                included_map[s[j]] = included_map.get(s[j], 0) + 1
-            while included_map.includes(target_map):
-                has_ans = True
-                ans = s[i: j+1] if j+1-i < len(ans) else ans
-                
-                if s[i] in t:
-                    included_map[s[i]] = included_map.get(s[i], 0) - 1
-                i += 1
-        return ans if has_ans else ""
+        target = Counter(t)
 
-s = "ADOBECODEBANC"
-t = "ABC"
+
+        def covered():
+            nonlocal target
+            return all(_ <= 0 for _ in target.values())
+
+
+        i = j = 0
+        ans = None
+        while j < len(s):
+            while j < len(s) and not covered():
+                if s[j] in target:
+                    target[s[j]] -= 1
+                j += 1
+
+            while i < j and covered():
+                ans = s[i:j] if (ans is None or len(ans) > len(s[i:j])) else ans
+                if s[i] in target:
+                    target[s[i]] += 1
+                    while i < j and s[i] not in target:
+                        i += 1
+                i += 1
+
+        return ans
+
+
+
+
+s = "BBA"
+t = "AB"
 
 print(Solution().minWindow(s, t))
