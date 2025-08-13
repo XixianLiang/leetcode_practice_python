@@ -1,0 +1,9 @@
+solution_cpp/
+.vscode/
+gpt/
+.hypothesis/
+*.log
+
+__pycache__/
+
+.DS_Store
