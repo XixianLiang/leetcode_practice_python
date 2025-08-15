@@ -2,14 +2,15 @@ from typing import List
 
 
 class Solution:
-    def maxProfit(self, prices: List[int]) -> int:
+    def maxProfit(self, k:int, prices: List[int]) -> int:
         n = len(prices)
-        dp = [[0 for _ in range(n)] for _ in range(5)]
+        dp = [[0 for _ in range(n)] for _ in range(2*k + 1)]
         
-        dp[1][0] = -prices[0]
-        dp[3][0] = - prices[0]
+        for i in range(1, 2*k+1, 2):
+            dp[i][0] = -prices[0]
+            dp[i][0] = - prices[0]
         
-        for i in range(1, 5):
+        for i in range(1, 2*k+1):
             for j in range(1, n):
                 # buy something
                 if i % 2 == 1:
@@ -19,7 +20,3 @@ class Solution:
                     dp[i][j] = max(dp[i][j-1], dp[i-1][j] + prices[j])
         
         return dp[-1][-1]
-        
-
-
-Solution().maxProfit([3,3,5,0,0,3,1,4])
